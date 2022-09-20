@@ -39,6 +39,18 @@ jobs:
             fi \
             && cd ~/repos/root-to-rise-ci \
             && git pull origin master \
+            && if [[ -z $(docker container ls -a | grep "wordpress-root-to-rise") ]]; \
+            then echo "No container found. Starting wordpress-root-to-rise container..."; \
+            else docker stop wordpress-root-to-rise && docker rm wordpress-root-to-rise; \
+            fi \
+            && if [[ -z $(docker container ls -a | grep "db-mysql-root-to-rise") ]]; \
+            then echo "No container found. Starting db-mysql-root-to-rise container..."; \
+            else docker stop db-mysql-root-to-rise && docker rm db-mysql-root-to-rise; \
+            fi \
+            && if [[ -z $(docker container ls -a | grep "php-myadmin-root-to-rise") ]]; \
+            then echo "No container found. Starting php-myadmin-root-to-rise container..."; \
+            else docker stop php-myadmin-root-to-rise && docker rm php-myadmin-root-to-rise; \
+            fi \
             && MYSQL_PORT="${envVars[0]}" \
             WP_PORT="${envVars[1]}" \
             PHPMYADMIN_PORT="${envVars[2]}" \
@@ -46,6 +58,6 @@ jobs:
             WP_DB="${envVars[4]}" \
             WP_DB_PASS="${envVars[5]}" \
             ROOT_DB_PASS="${envVars[6]}" \
-            docker compose up --build \
+            docker compose up -d --build \
             && exit \
             && exit 0;
