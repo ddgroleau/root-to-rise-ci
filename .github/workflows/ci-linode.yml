@@ -33,8 +33,8 @@ jobs:
           envs: MYSQL_PORT,WP_PORT,PHPMYADMIN_PORT,MYSQL_USER,WP_DB,WP_DB_PASS,ROOT_DB_PASS
           script: |
             export envVars=("$MYSQL_PORT" "$WP_PORT" "$PHPMYADMIN_PORT" "$MYSQL_USER" "$WP_DB" "$WP_DB_PASS" "$ROOT_DB_PASS") \
-            && if [[ ! -d repos  ]]; then mkdir repos; fi \
-            && if [[ ! -d root-to-rise-ci ]]; \
+            && if [[ ! -d ~/repos  ]]; then mkdir repos; fi \
+            && if [[ ! -d ~/repos/root-to-rise-ci ]]; \
             then (cd repos && git clone https://github.com/ddgroleau/root-to-rise-ci.git); \
             fi \
             && cd ~/repos/root-to-rise-ci \
