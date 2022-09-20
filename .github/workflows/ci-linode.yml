@@ -46,6 +46,6 @@ jobs:
             WP_DB="${envVars[4]}" \
             WP_DB_PASS="${envVars[5]}" \
             ROOT_DB_PASS="${envVars[6]}" \
-            docker-compose up --build \
+            docker compose up --build \
             && exit \
             && exit 0;
