@@ -1,0 +1,51 @@
+name: Deploy to Linode Compute Instance
+
+on:
+  push:
+    branches: ["master"]
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker - Build Images and Run Containers on Linode Remote Server
+        uses: appleboy/ssh-action@master
+        env:
+          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+          WP_PORT: ${{ secrets.WP_PORT }}
+          PHPMYADMIN_PORT: ${{ secrets.PHPMYADMIN_PORT }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          WP_DB: ${{ secrets.WP_DB }}
+          WP_DB_PASS: ${{ secrets.WP_DB_PASS }}
+          ROOT_DB_PASS: ${{ secrets.ROOT_DB_PASS }}
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          envs: MYSQL_PORT,WP_PORT,PHPMYADMIN_PORT,MYSQL_USER,WP_DB,WP_DB_PASS,ROOT_DB_PASS
+          script: |
+            export envVars=("$MYSQL_PORT" "$WP_PORT" "$PHPMYADMIN_PORT" "$MYSQL_USER" "$WP_DB" "$WP_DB_PASS" "$ROOT_DB_PASS") \
+            && if [[ ! -d repos  ]]; then mkdir repos; fi \
+            && if [[ ! -d root-to-rise-ci ]]; \
+            then (cd repos && git clone https://github.com/ddgroleau/root-to-rise-ci.git); \
+            fi \
+            && cd ~/repos/root-to-rise-ci \
+            && git pull origin master \
+            && MYSQL_PORT="${envVars[0]}" \
+            WP_PORT="${envVars[1]}" \
+            PHPMYADMIN_PORT="${envVars[2]}" \
+            MYSQL_USER="${envVars[3]}" \
+            WP_DB="${envVars[4]}" \
+            WP_DB_PASS="${envVars[5]}" \
+            ROOT_DB_PASS="${envVars[6]}" \
+            docker-compose up --build \
+            && exit \
+            && exit 0;
